@@ -28,7 +28,7 @@ readonly -A PLUG_MAP=(
 get_power_state() {
     local plug_number=$1
 
-    snmpget "${SNMP_PUBLIC[@]}" -Os "${STATUS_N}.${plug_number}"
+    snmpget "${SNMP_PUBLIC[@]}" -Oqv "${STATUS_N}.${plug_number}"
 }
 
 set_power_state() {
@@ -86,20 +86,31 @@ plug_number="${PLUG_MAP[${plug_name}]}"
 
 case "${action}" in
     get_status)
-	echo "Status of ${plug_name} (${plug_number})"
+	echo -n "Status of ${plug_name} (${plug_number}): "
 	get_power_state "${plug_number}"
 	;;
     turn_off)
-	echo "Turning off ${plug_name} (${plug_number})"
-	set_power_off "${plug_number}"
+	echo -n "Turning off ${plug_name} (${plug_number}) ... "
+	set_power_off "${plug_number}" >/dev/null
 	sleep 2
-	get_power_state "${plug_number}"
+	status=$(get_power_state "${plug_number}")
+	if [[ ${status} == "off" ]]; then
+	    echo "ok, now off"
+	else
+	    echo "failed!"
+	    die 3 "Error: failed to turn off ${plug_name} (${plug_number}), last status: ${status}"
+	fi
 	;;
     turn_on)
-	echo "Turning on ${plug_name} (${plug_number})"
-	set_power_on "${plug_number}"
-	sleep 2
-	get_power_state "${plug_number}"
+	echo -n "Turning on ${plug_name} (${plug_number}) ... "
+	set_power_on "${plug_number}" >/dev/null
+	status=$(get_power_state "${plug_number}")
+	if [[ ${status} == "on" ]]; then
+	    echo "ok, now on"
+	else
+	    echo "failed!"
+	    die 3 "Error: failed to turn on ${plug_name} (${plug_number}), last status: ${status}"
+	fi
 	;;
     *)
 	usage
