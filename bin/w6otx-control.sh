@@ -13,6 +13,18 @@ SWITCHED_OUTLET="${RPDU2}.rPDU2Outlet.rPDU2OutletSwitched"
 STATUS_N="${SWITCHED_OUTLET}.rPDU2OutletSwitchedStatusTable.rPDU2OutletSwitchedStatusEntry.rPDU2OutletSwitchedStatusState"
 COMMAND_N="${SWITCHED_OUTLET}.rPDU2OutletSwitchedControlTable.rPDU2OutletSwitchedControlEntry.rPDU2OutletSwitchedControlCommand"
 
+readonly -A PLUG_MAP=(
+    [Battery_Charger]=1
+    [Unused2]=2
+    [Unused3]=3
+    [Unused4]=4
+    [Unused5]=5
+    [UHF_DMR]=6
+    [900MHz]=7
+    [VHF_DMR]=8
+    )
+
+
 get_power_state() {
     local plug_number=$1
 
@@ -45,22 +57,18 @@ die() {
     exit "${rc}"
 }
 
-usage() {
-    echo "Usage: $0 {get_status|turn_on|turn_off} {plug_name}" 2>&1
-    exit 1
+print_plug_names() {
+    echo "Known plug names:" >&2
+    for name in "${!PLUG_MAP[@]}"; do
+	echo "  ${name}" >&2
+    done
 }
 
-
-readonly -A PLUG_MAP=(
-    [Battery_Charger]=1
-    [Unused2]=2
-    [Unused3]=3
-    [Unused4]=4
-    [Unused5]=5
-    [UHF_DMR]=6
-    [900MHz]=7
-    [VHF_DMR]=8
-    )
+usage() {
+    echo "Usage: $0 {get_status|turn_on|turn_off} {plug_name}" 2>&1
+    print_plug_names
+    exit 1
+}
 
 if (( $# != 2 )); then
     usage
@@ -70,10 +78,7 @@ action="$1"
 plug_name="$2"
 
 if [[ ${PLUG_MAP[$plug_name]:-unset} == "unset" ]]; then
-    echo "Known plug names:" >&2
-    for name in "${!PLUG_MAP[@]}"; do
-	echo "  ${name}" >&2
-    done
+    print_plug_names
     die 2 "Error: unknown plug name \"${plug_name}\""
 fi
 
