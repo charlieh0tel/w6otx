@@ -51,7 +51,7 @@ usage() {
 }
 
 
-declare -A PLUG_MAP=(
+readonly -A PLUG_MAP=(
     [Battery_Charger]=1
     [Unused2]=2
     [Unused3]=3
@@ -69,7 +69,7 @@ fi
 action="$1"
 plug_name="$2"
 
-if [[ ! -v ${PLUG_MAP[$plug_name]} ]]; then
+if [[ ${PLUG_MAP[$plug_name]:-unset} == "unset" ]]; then
     echo "Known plug names:" >&2
     for name in "${!PLUG_MAP[@]}"; do
 	echo "  ${name}" >&2
@@ -103,5 +103,5 @@ esac
 
 
 # Local Variables:
-# compile-command: "shellcheck --format=gcc repeater-control.sh"
+# compile-command: "shellcheck --format=gcc w6otx-control.sh"
 # End:
