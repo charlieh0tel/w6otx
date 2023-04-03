@@ -11,7 +11,7 @@ SNMP_PRIVATE=("${SNMP_COMMON[@]}" -c private "${SNMP_AGENT}")
 RPDU2=".iso.org.dod.internet.private.enterprises.apc.products.hardware.rPDU2"
 SWITCHED_OUTLET="${RPDU2}.rPDU2Outlet.rPDU2OutletSwitched"
 STATUS_N="${SWITCHED_OUTLET}.rPDU2OutletSwitchedStatusTable.rPDU2OutletSwitchedStatusEntry.rPDU2OutletSwitchedStatusState"
-COMMAND_N="${SWITCHED_OUTLET}.rPDU2OutletSwitchedControlTable.rPDU2OutletSwitchedControlEntry.rPDU2OutletSwitchedControlCommand"
+CONTROL_N="${SWITCHED_OUTLET}.rPDU2OutletSwitchedControlTable.rPDU2OutletSwitchedControlEntry.rPDU2OutletSwitchedControlCommand"
 
 readonly -A PLUG_MAP=(
     [Battery_Charger]=1
@@ -35,7 +35,7 @@ set_power_state() {
     local plug_number=$1
     local state=$2
 
-    snmpset "${SNMP_PRIVATE[@]}" "${COMMAND_N}.${plug_number}" = "${state}"
+    snmpset "${SNMP_PRIVATE[@]}" "${CONTROL_N}.${plug_number}" = "${state}"
 }
 
 set_power_on() {
