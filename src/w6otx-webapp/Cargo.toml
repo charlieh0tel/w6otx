@@ -1,0 +1,10 @@
+[package]
+name = "w6otx"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+snmp = "0.2.2"
+clap = { version = "4.4.8", features = ["derive", "env"] }
+num_enum = "0.7.1"
+enum-iterator = "1.4.1"
