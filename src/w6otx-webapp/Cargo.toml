@@ -2,9 +2,22 @@
 name = "w6otx"
 version = "0.1.0"
 edition = "2021"
+description="Power control CLI for W6OTX repeater system."
+license-file="../../LICENSE"
 
 [dependencies]
 snmp = "0.2.2"
 clap = { version = "4.4.8", features = ["derive", "env"] }
 num_enum = "0.7.1"
 enum-iterator = "1.4.1"
+
+[package.metadata.deb]
+maintainer = "Christopher Hoover <ch@murgatroid.com>"
+copyright = "2023, Christopher Hoover <ch@murgatroid.com>"
+license-file = ["../../LICENSE", "0"]
+depends = "$auto"
+section = "utility"
+priority = "optional"
+assets = [
+    ["target/release/w6otx_power_cli", "usr/bin/", "755"],
+ ]
