@@ -28,10 +28,9 @@ pub fn get_outlet_status(session: &mut SyncSession, n: u32) -> Result<OutletStat
     let result = session.get(&oid);
     match result {
         Ok(mut pdu) => match pdu.varbinds.next() {
-            Some((_, Value::Integer(n))) => match OutletStatus::try_from(n) {
-                Ok(outlet_status) => Ok(outlet_status),
-                Err(..) => Err(SnmpError::ValueOutOfRange),
-            },
+            Some((_, Value::Integer(n))) => {
+                OutletStatus::try_from(n).map_err(|_| SnmpError::ValueOutOfRange)
+            }
             Some(_) | None => Err(SnmpError::ValueOutOfRange),
         },
         Err(error) => Err(error),
@@ -45,11 +44,7 @@ pub fn control_outlet(
 ) -> Result<(), SnmpError> {
     let oid = make_outlet_control_oid(n);
     let value = Value::Integer(command as i64);
-    let result = session.set(&[(&oid, value)]);
-    match result {
-        Ok(_) => Ok(()),
-        Err(error) => Err(error),
-    }
+    session.set(&[(&oid, value)]).map(|_| ())
 }
 
 fn make_outlet_status_oid(n: u32) -> [u32; 16] {
