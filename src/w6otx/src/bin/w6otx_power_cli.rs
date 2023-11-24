@@ -18,10 +18,10 @@ struct Args {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    PowerOn { outlet: Outlet },
-    PowerOff { outlet: Outlet },
-    Bounce { outlet: Outlet },
-    Status { outlet: Outlet },
+    PowerOn { outlet: w6otx_snmp::Outlet },
+    PowerOff { outlet: w6otx_snmp::Outlet },
+    Bounce { outlet: w6otx_snmp::Outlet },
+    Status { outlet: w6otx_snmp::Outlet },
 }
 
 #[allow(non_camel_case_types)]

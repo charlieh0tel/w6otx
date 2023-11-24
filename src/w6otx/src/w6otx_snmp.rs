@@ -1,7 +1,22 @@
+use clap::ValueEnum;
+use enum_iterator::Sequence;
 use num_enum::TryFromPrimitive;
+use snmp::{SnmpError, SyncSession, Value};
 use std::convert::TryFrom;
 
-use snmp::{SnmpError, SyncSession, Value};
+#[allow(non_camel_case_types)]
+#[derive(Clone, Debug, ValueEnum, Copy, Sequence)]
+#[repr(u32)]
+pub enum Outlet {
+    BatteryCharger = 1,
+    Unused2 = 2,
+    Unused3 = 3,
+    Unused4 = 4,
+    Unused5 = 5,
+    DMR_70cm = 6,
+    FM_33cm = 7,
+    DMR_2m = 8,
+}
 
 #[derive(Debug, TryFromPrimitive)]
 #[repr(i64)]
