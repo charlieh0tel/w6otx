@@ -5,7 +5,7 @@ use snmp::{SnmpError, SyncSession, Value};
 use std::convert::TryFrom;
 
 #[allow(non_camel_case_types)]
-#[derive(Clone, Debug, ValueEnum, Copy, Sequence)]
+#[derive(Clone, Debug, ValueEnum, Copy, Sequence, TryFromPrimitive)]
 #[repr(u32)]
 pub enum Outlet {
     BatteryCharger = 1,
@@ -38,8 +38,11 @@ pub enum OutletControlCommand {
     CancelPendingCommand = 8,
 }
 
-pub fn get_outlet_status(session: &mut SyncSession, n: u32) -> Result<OutletStatus, SnmpError> {
-    let oid = make_outlet_status_oid(n);
+pub fn get_outlet_status(
+    session: &mut SyncSession,
+    outlet: Outlet,
+) -> Result<OutletStatus, SnmpError> {
+    let oid = make_outlet_status_oid(outlet as u32);
     let result = session.get(&oid);
     match result {
         Ok(mut pdu) => match pdu.varbinds.next() {
@@ -54,10 +57,10 @@ pub fn get_outlet_status(session: &mut SyncSession, n: u32) -> Result<OutletStat
 
 pub fn control_outlet(
     session: &mut SyncSession,
-    n: u32,
+    outlet: Outlet,
     command: OutletControlCommand,
 ) -> Result<(), SnmpError> {
-    let oid = make_outlet_control_oid(n);
+    let oid = make_outlet_control_oid(outlet as u32);
     let value = Value::Integer(command as i64);
     session.set(&[(&oid, value)]).map(|_| ())
 }
