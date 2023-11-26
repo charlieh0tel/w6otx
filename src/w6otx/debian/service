@@ -1,0 +1,10 @@
+[Unit]
+Description=W6OTX web application
+
+[Service]
+Type=exec
+ExecStart=/usr/bin/w6otx_webapp
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

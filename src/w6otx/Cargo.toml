@@ -28,3 +28,5 @@ assets = [
     ["target/release/w6otx_power_cli", "usr/bin/", "755"],
     ["target/release/w6otx_webapp", "usr/bin/", "755"],
  ]
+maintainer-scripts = "debian/"
+systemd-units = { enable = true }
