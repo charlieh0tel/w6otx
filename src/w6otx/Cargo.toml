@@ -26,4 +26,5 @@ section = "utility"
 priority = "optional"
 assets = [
     ["target/release/w6otx_power_cli", "usr/bin/", "755"],
+    ["target/release/w6otx_webapp", "usr/bin/", "755"],
  ]
