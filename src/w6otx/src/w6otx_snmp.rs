@@ -1,9 +1,10 @@
 use clap::ValueEnum;
 use snmp::{SnmpError, SyncSession, Value};
-use strum::{Display, EnumIter, FromRepr, IntoStaticStr};
+use strum::{AsRefStr, Display, EnumIter, EnumString, FromRepr, IntoStaticStr};
 
 #[allow(non_camel_case_types)]
-#[derive(Clone, Debug, ValueEnum, Copy, EnumIter, FromRepr, Display, IntoStaticStr)]
+#[derive(Clone, Debug, ValueEnum, Copy, EnumIter, FromRepr, Display, IntoStaticStr, EnumString)]
+#[strum(serialize_all = "kebab-case")]
 #[repr(u32)]
 pub enum Outlet {
     BatteryCharger = 1,
@@ -16,14 +17,16 @@ pub enum Outlet {
     DMR_2m = 8,
 }
 
-#[derive(Debug, FromRepr, Display, IntoStaticStr)]
+#[derive(Debug, FromRepr, Display, IntoStaticStr, AsRefStr)]
+#[strum(serialize_all = "kebab-case")]
 #[repr(i64)]
 pub enum OutletStatus {
     Off = 1,
     On = 2,
 }
 
-#[derive(Debug)]
+#[derive(Debug, EnumString)]
+#[strum(serialize_all = "kebab-case")]
 #[repr(i64)]
 pub enum OutletControlCommand {
     ImmediateOn = 1,

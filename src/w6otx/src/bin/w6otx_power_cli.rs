@@ -1,5 +1,4 @@
 use clap::{Parser, Subcommand};
-use inflections::case;
 use snmp::SyncSession;
 use std::time::Duration;
 use strum::IntoEnumIterator;
@@ -52,17 +51,13 @@ fn main() {
         Some(Commands::Status { outlet }) => {
             let status = w6otx_snmp::get_outlet_status(&mut session, *outlet)
                 .expect("Failed to get outlet status.");
-            let kebab_cased_outlet = case::to_kebab_case(outlet.into());
-            let kebab_cased_status = case::to_kebab_case(status.into());
-            println!("{kebab_cased_outlet} {kebab_cased_status}");
+            println!("{} {}", outlet, status);
         }
         None => {
             for outlet in w6otx_snmp::Outlet::iter() {
                 let status = w6otx_snmp::get_outlet_status(&mut session, outlet)
                     .expect("Failed to get outlet status.");
-                let kebab_cased_outlet = case::to_kebab_case(outlet.into());
-                let kebab_cased_status = case::to_kebab_case(status.into());
-                println!("{kebab_cased_outlet} {kebab_cased_status}");
+                println!("{} {}", outlet, status);
             }
         }
     }
