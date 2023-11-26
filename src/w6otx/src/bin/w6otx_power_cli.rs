@@ -52,7 +52,8 @@ fn main() {
         Some(Commands::Status { outlet }) => {
             let status = w6otx_snmp::get_outlet_status(&mut session, *outlet)
                 .expect("Failed to get outlet status.");
-            println!("{outlet:?} {status:?}");
+            let kebab_cased_outlet = case::to_kebab_case(outlet.into());
+            println!("{kebab_cased_outlet} {status:?}");
         }
         None => {
             for outlet in w6otx_snmp::Outlet::iter() {
