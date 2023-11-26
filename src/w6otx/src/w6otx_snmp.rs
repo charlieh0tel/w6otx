@@ -1,11 +1,9 @@
 use clap::ValueEnum;
-use enum_iterator::Sequence;
-use num_enum::TryFromPrimitive;
 use snmp::{SnmpError, SyncSession, Value};
-use std::convert::TryFrom;
+use strum::{Display, EnumIter, FromRepr, IntoStaticStr};
 
 #[allow(non_camel_case_types)]
-#[derive(Clone, Debug, ValueEnum, Copy, Sequence, TryFromPrimitive)]
+#[derive(Clone, Debug, ValueEnum, Copy, EnumIter, FromRepr, Display, IntoStaticStr)]
 #[repr(u32)]
 pub enum Outlet {
     BatteryCharger = 1,
@@ -18,7 +16,7 @@ pub enum Outlet {
     DMR_2m = 8,
 }
 
-#[derive(Debug, TryFromPrimitive)]
+#[derive(Debug, FromRepr)]
 #[repr(i64)]
 pub enum OutletStatus {
     Off = 1,
@@ -47,7 +45,7 @@ pub fn get_outlet_status(
     match result {
         Ok(mut pdu) => match pdu.varbinds.next() {
             Some((_, Value::Integer(n))) => {
-                OutletStatus::try_from(n).map_err(|_| SnmpError::ValueOutOfRange)
+                OutletStatus::from_repr(n).ok_or(SnmpError::ValueOutOfRange)
             }
             Some(_) | None => Err(SnmpError::ValueOutOfRange),
         },

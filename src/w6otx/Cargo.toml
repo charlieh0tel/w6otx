@@ -1,6 +1,6 @@
 [package]
 name = "w6otx"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description="Power control CLI for W6OTX repeater system."
 license-file="../../LICENSE"
@@ -8,8 +8,13 @@ license-file="../../LICENSE"
 [dependencies]
 snmp = "0.2.2"
 clap = { version = "4.4.8", features = ["derive", "env"] }
-num_enum = "0.7.1"
-enum-iterator = "1.4.1"
+inflections = "1.1.1"
+strum = { version = "0.25.0", features = ["derive", "strum_macros"] }
+#
+#tide = "0.16.0"
+#async-std = { version = "1.8.0", features = ["attributes"] }
+#serde = { version = "1.0", features = ["derive"] }
+#femme = "2.2.1"
 
 [package.metadata.deb]
 maintainer = "Christopher Hoover <ch@murgatroid.com>"

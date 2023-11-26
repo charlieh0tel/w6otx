@@ -1,7 +1,8 @@
 use clap::{Parser, Subcommand};
-use enum_iterator::all;
+use inflections::case;
 use snmp::SyncSession;
 use std::time::Duration;
+use strum::IntoEnumIterator;
 use w6otx::w6otx_snmp;
 
 const DEFAULT_HOST: &str = "apc-rpdu:161";
@@ -54,10 +55,11 @@ fn main() {
             println!("{outlet:?} {status:?}");
         }
         None => {
-            for outlet in all::<w6otx_snmp::Outlet>() {
+            for outlet in w6otx_snmp::Outlet::iter() {
                 let status = w6otx_snmp::get_outlet_status(&mut session, outlet)
                     .expect("Failed to get outlet status.");
-                println!("{outlet:?} {status:?}");
+                let kebab_cased_outlet = case::to_kebab_case(outlet.into());
+                println!("{kebab_cased_outlet} {status:?}");
             }
         }
     }
