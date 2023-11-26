@@ -9,14 +9,14 @@ use std::str::FromStr;
 const DEFAULT_HOST: &str = "apc-rpdu:161";
 
 #[derive(Debug, Serialize)]
-struct PowerStatus {
+struct OutletStatus {
     outlet: String,
-    state: String,
+    status: String,
 }
 
 #[derive(Debug, Serialize)]
-struct SystemPowerState {
-    statuses: Vec<PowerStatus>
+struct SystemPowerStatus {
+    statuses: Vec<OutletStatus>
 }
 
 #[derive(Debug, Deserialize)]
@@ -25,21 +25,21 @@ struct ControlOutlet {
     command: String,
 }
 
-async fn system_power_state(_: Request<()>) -> tide::Result {
+async fn system_power_status(_: Request<()>) -> tide::Result {
     let community = b"private";
     let timeout = Duration::from_secs(5);
     let mut session = SyncSession::new(DEFAULT_HOST, community,
                                        Some(timeout), 0)?;
     let statuses = 
         w6otx_snmp::Outlet::iter().map(|outlet| {
-            let state = match w6otx_snmp::get_outlet_status(&mut session, outlet) {
+            let status = match w6otx_snmp::get_outlet_status(&mut session, outlet) {
                 Ok(status) => status.to_string(),
                 Err(_) => "? (failure)".into()
             };
-            PowerStatus { outlet: outlet.to_string(), state }
+            OutletStatus { outlet: outlet.to_string(), status }
         }).collect();
-    let system_power_state = SystemPowerState{ statuses };
-    let json = serde_json::to_string(&system_power_state)?;
+    let system_power_status = SystemPowerStatus{ statuses };
+    let json = serde_json::to_string(&system_power_status)?;
     let response = Response::builder(StatusCode::Ok)
         .body(json)
         .content_type("application/json")
@@ -59,7 +59,6 @@ async fn control_outlet(mut request: Request<()>) -> tide::Result {
         Ok(_) => Ok("ok".into()),
         Err(_) => Ok("failed".into())
     }
-
 }
 
 
@@ -80,7 +79,7 @@ async fn main() -> tide::Result<()> {
     app.with(tide::log::LogMiddleware::new());
 
     app.at("/").get(root);
-    app.at("/system_power_state").get(system_power_state);
+    app.at("/system_power_status").get(system_power_status);
     app.at("/control_outlet").post(control_outlet);
 
     app.listen("0.0.0.0:8080").await?;
@@ -134,7 +133,7 @@ const ROOT_HTML: &str = r#"
         <thead>
             <tr>
                 <th>Outlet</th>
-                <th>State</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -146,7 +145,7 @@ const ROOT_HTML: &str = r#"
     <script>
         async function fetchStatus() {
             try {
-                const response = await fetch('/system_power_state');
+                const response = await fetch('/system_power_status');
                 const data = await response.json();
                 updateTable(data.statuses);
             } catch (error) {
@@ -161,7 +160,7 @@ const ROOT_HTML: &str = r#"
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${status.outlet}</td>
-                    <td>${status.state}</td>
+                    <td>${status.status}</td>
                     <td>
                         <button class="btn btn-on" onclick="sendCommand('${status.outlet}', 'immediate-on')">On</button>
                         <button class="btn btn-off" onclick="sendCommand('${status.outlet}', 'immediate-off')">Off</button>
