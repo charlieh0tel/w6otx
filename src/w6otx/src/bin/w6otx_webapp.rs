@@ -1,12 +1,15 @@
+use maud::{html, PreEscaped, DOCTYPE};
 use snmp::SyncSession;
+use std::str::FromStr;
 use std::time::Duration;
 use strum::IntoEnumIterator;
 use tide::prelude::*;
-use tide::{Request,Response, StatusCode};
+use tide::{Request, Response, StatusCode};
 use w6otx::w6otx_snmp;
-use std::str::FromStr;
 
-const DEFAULT_HOST: &str = "apc-rpdu:161";
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+const DEFAULT_SNMP_HOST: &str = "apc-rpdu:161";
 
 #[derive(Debug, Serialize)]
 struct OutletStatus {
@@ -16,7 +19,7 @@ struct OutletStatus {
 
 #[derive(Debug, Serialize)]
 struct SystemPowerStatus {
-    statuses: Vec<OutletStatus>
+    statuses: Vec<OutletStatus>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -28,17 +31,20 @@ struct ControlOutlet {
 async fn system_power_status(_: Request<()>) -> tide::Result {
     let community = b"private";
     let timeout = Duration::from_secs(5);
-    let mut session = SyncSession::new(DEFAULT_HOST, community,
-                                       Some(timeout), 0)?;
-    let statuses = 
-        w6otx_snmp::Outlet::iter().map(|outlet| {
+    let mut session = SyncSession::new(DEFAULT_SNMP_HOST, community, Some(timeout), 0)?;
+    let statuses = w6otx_snmp::Outlet::iter()
+        .map(|outlet| {
             let status = match w6otx_snmp::get_outlet_status(&mut session, outlet) {
                 Ok(status) => status.to_string(),
-                Err(_) => "? (failure)".into()
+                Err(_) => "? (failure)".into(),
             };
-            OutletStatus { outlet: outlet.to_string(), status }
-        }).collect();
-    let system_power_status = SystemPowerStatus{ statuses };
+            OutletStatus {
+                outlet: outlet.to_string(),
+                status,
+            }
+        })
+        .collect();
+    let system_power_status = SystemPowerStatus { statuses };
     let json = serde_json::to_string(&system_power_status)?;
     let response = Response::builder(StatusCode::Ok)
         .body(json)
@@ -53,23 +59,20 @@ async fn control_outlet(mut request: Request<()>) -> tide::Result {
     let command = w6otx_snmp::OutletControlCommand::from_str(command.as_ref())?;
     let community = b"private";
     let timeout = Duration::from_secs(5);
-    let mut session = SyncSession::new(DEFAULT_HOST, community,
-                                       Some(timeout), 0)?;
+    let mut session = SyncSession::new(DEFAULT_SNMP_HOST, community, Some(timeout), 0)?;
     match w6otx_snmp::control_outlet(&mut session, outlet, command) {
         Ok(_) => Ok("ok".into()),
-        Err(_) => Ok("failed".into())
+        Err(_) => Ok("failed".into()),
     }
 }
 
-
 async fn root(_: Request<()>) -> tide::Result {
     let response = Response::builder(StatusCode::Ok)
-        .body(ROOT_HTML)
+        .body(root_page())
         .content_type("text/html")
         .build();
     Ok(response)
 }
-
 
 #[async_std::main]
 async fn main() -> tide::Result<()> {
@@ -87,62 +90,49 @@ async fn main() -> tide::Result<()> {
     Ok(())
 }
 
-
-const ROOT_HTML: &str = r#"
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>W6OTX Power Status</title>
-    <style>
-        table {
-            border-collapse: collapse;
-	    /*width: 50%;*/
-            margin: 20px /*auto*/;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .btn {
-            padding: 5px 10px;
-            margin-right: 5px;
-            cursor: pointer;
-        }
-        .btn-on {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .btn-off {
-            background-color: #f44336;
-            color: white;
-        }
-        .btn-bounce {
-            background-color: #2196F3;
-            color: white;
-        }
-    </style>
-</head>
-<body>
-    <h1>W6OTX Power Status</h1>
-    <table id="statusTable">
-        <thead>
-            <tr>
-                <th>Outlet</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="statusBody">
-            <!-- Status data will be inserted here -->
-        </tbody>
-    </table>
-
-    <script>
+fn root_page() -> String {
+    html! {
+      (DOCTYPE)
+          html lang="en" {
+              head {
+                  meta name="viewport" content="width=device-width, initial-scale=1.0";
+                  title { "W6OTX Power Status " }
+                  style {
+                      (PreEscaped(r#"
+            table {
+              border-collapse: collapse;
+	      /*width: 50%;*/
+              margin: 20px /*auto*/;
+            }
+            th, td {
+              border: 1px solid #ddd;
+              padding: 8px;
+              text-align: left;
+            }
+            th {
+              background-color: #f2f2f2;
+            }
+           .btn {
+              padding: 5px 10px;
+              margin-right: 5px;
+              cursor: pointer;
+            }
+            .btn-on {
+              background-color: #4CAF50;
+              color: white;
+            }
+            .btn-off {
+              background-color: #f44336;
+              color: white;
+            }
+            .btn-bounce {
+              background-color: #2196F3;
+              color: white;
+            }
+          "#))
+                  }
+                  script {
+                      (PreEscaped(r#"
         async function fetchStatus() {
             try {
                 const response = await fetch('/system_power_status');
@@ -193,8 +183,27 @@ const ROOT_HTML: &str = r#"
 
         setInterval(fetchStatus, 5000);
         fetchStatus();
-    </script>
-</body>
-</html>
-"#;
+        "#))
+                  }
 
+              }
+              body {
+                  h1 { "W6OTX Power Status" }
+                  table #statusTable {
+                      thead {
+                          tr {
+                              th { "Outlet" }
+                              th { "Status" }
+                              th { "Actions" }
+                          }
+                      }
+                      tbody #statusBody {
+                          (PreEscaped(r#"<!-- Status data will be inserted here -->"#))
+                      }
+                  }
+                  hr;
+                  p { "Version " (VERSION) }
+              }
+          }
+  }.into_string()
+}

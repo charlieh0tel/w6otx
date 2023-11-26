@@ -1,6 +1,6 @@
 [package]
 name = "w6otx"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
 description="Power control CLI and web app for W6OTX repeater system."
 license-file="../../LICENSE"
@@ -16,6 +16,7 @@ serde = { version = "1.0", features = ["derive"] }
 femme = "2.2.1"
 serde_json = "1.0.108"
 mime = "0.3.17"
+maud = { version = "0.25.0", features = ["tide"] }
 
 [package.metadata.deb]
 maintainer = "Christopher Hoover <ch@murgatroid.com>"
