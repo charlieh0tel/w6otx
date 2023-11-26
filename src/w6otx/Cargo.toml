@@ -1,6 +1,6 @@
 [package]
 name = "w6otx"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 description="Power control CLI and web app for W6OTX repeater system."
 license-file="../../LICENSE"
