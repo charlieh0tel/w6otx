@@ -16,7 +16,7 @@ pub enum Outlet {
     DMR_2m = 8,
 }
 
-#[derive(Debug, FromRepr)]
+#[derive(Debug, FromRepr, Display, IntoStaticStr)]
 #[repr(i64)]
 pub enum OutletStatus {
     Off = 1,

@@ -53,14 +53,16 @@ fn main() {
             let status = w6otx_snmp::get_outlet_status(&mut session, *outlet)
                 .expect("Failed to get outlet status.");
             let kebab_cased_outlet = case::to_kebab_case(outlet.into());
-            println!("{kebab_cased_outlet} {status:?}");
+            let kebab_cased_status = case::to_kebab_case(status.into());
+            println!("{kebab_cased_outlet} {kebab_cased_status}");
         }
         None => {
             for outlet in w6otx_snmp::Outlet::iter() {
                 let status = w6otx_snmp::get_outlet_status(&mut session, outlet)
                     .expect("Failed to get outlet status.");
                 let kebab_cased_outlet = case::to_kebab_case(outlet.into());
-                println!("{kebab_cased_outlet} {status:?}");
+                let kebab_cased_status = case::to_kebab_case(status.into());
+                println!("{kebab_cased_outlet} {kebab_cased_status}");
             }
         }
     }
