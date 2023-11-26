@@ -93,12 +93,13 @@ const ROOT_HTML: &str = r#"
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Status Table</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>W6OTX Power Status</title>
     <style>
         table {
             border-collapse: collapse;
-            /*width: 50%;*/
-            /*margin: 20px auto;*/
+	    /*width: 50%;*/
+            margin: 20px /*auto*/;
         }
         th, td {
             border: 1px solid #ddd;
