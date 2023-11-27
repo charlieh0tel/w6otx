@@ -102,7 +102,7 @@ fn root_page() -> String {
             table {
               border-collapse: collapse;
 	      /*width: 50%;*/
-              margin: 20px /*auto*/;
+              /*margin: 20px auto;*/
             }
             th, td {
               border: 1px solid #ddd;
