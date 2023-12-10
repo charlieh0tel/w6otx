@@ -10,7 +10,7 @@ pub enum Outlet {
     BatteryCharger = 1,
     Unused2 = 2,
     Unused3 = 3,
-    Unused4 = 4,
+    Switch = 4,
     Unused5 = 5,
     DMR_70cm = 6,
     FM_33cm = 7,
