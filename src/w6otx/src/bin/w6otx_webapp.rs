@@ -33,6 +33,7 @@ async fn system_power_status(_: Request<()>) -> tide::Result {
     let timeout = Duration::from_secs(5);
     let mut session = SyncSession::new(DEFAULT_SNMP_HOST, community, Some(timeout), 0)?;
     let statuses = w6otx_snmp::Outlet::iter()
+        .filter(|outlet| !outlet.to_string().starts_with("unused"))
         .map(|outlet| {
             let status = match w6otx_snmp::get_outlet_status(&mut session, outlet) {
                 Ok(status) => status.to_string(),
