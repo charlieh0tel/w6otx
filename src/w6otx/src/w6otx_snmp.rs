@@ -8,7 +8,7 @@ use strum::{AsRefStr, Display, EnumIter, EnumString, FromRepr, IntoStaticStr};
 #[repr(u32)]
 pub enum Outlet {
     LNA_33cm = 1,
-    Unused2 = 2,
+    W6otx_Allstar_rPi = 2,
     DishyPOE = 3,
     Switch = 4,
     Unused5 = 5,
