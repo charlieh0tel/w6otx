@@ -3,7 +3,15 @@ name = "w6otx"
 version = "0.6.1"
 edition = "2021"
 description="Power control CLI and web app for W6OTX repeater system."
-license-file="../../LICENSE"
+license-file="LICENSE"
+
+[[bin]]
+name = "w6otx_power_cli"
+path = "src/bin/w6otx_power_cli.rs"
+
+[[bin]]
+name = "w6otx_webapp"
+path = "src/bin/w6otx_webapp.rs"
 
 [dependencies]
 snmp = "0.2.2"
@@ -21,7 +29,7 @@ maud = { version = "0.25.0", features = ["tide"] }
 [package.metadata.deb]
 maintainer = "Christopher Hoover <ch@murgatroid.com>"
 copyright = "2023, Christopher Hoover <ch@murgatroid.com>"
-license-file = ["../../LICENSE", "0"]
+license-file = ["LICENSE", "0"]
 depends = "$auto"
 section = "utility"
 priority = "optional"
